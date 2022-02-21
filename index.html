@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>My first three.js app</title>
+        <style>
+            body {
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <script>
+            //To actually be able to display anything with three.js, we need three things: scene, camera and renderer,
+            //so that we can render the scene with camera.
+            const scene = new THREE.Scene();
+            //There are a few different cameras in three.js. For now, let's use a PerspectiveCamera.
+            const camera = new THREE.PerspectiveCamera(
+                //The first attribute is the field of view.
+                //FOV is the extent of the scene that is seen on the display at any given moment.
+                //The value is in degrees.
+                75,
+
+                //The second one is the aspect ratio.
+                //You almost always want to use the width of the element divided by the height,
+                //or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.
+                window.innerWidth / window.innerHeight,
+
+                //The next two attributes are the NEAR and FAR clipping plane.
+                //What that means, is that
+                //objects further away from the camera than the value of FAR
+                //or closer than NEAR
+                //won't be rendered.
+                0.1,
+                1000
+            );
+
+            //In addition to the WebGLRenderer we use here, three.js comes with a few others,
+            //often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.
+            const renderer = new THREE.WebGLRenderer();
+
+            //In addition to creating the renderer instance, we also need to set the size at which we want it to render our app.
+            //It's a good idea to use the width and height of the area we want to fill with our app -
+            //in this case, the width and height of the browser window.
+            //For performance intensive apps, you can also give setSize smaller values,
+            //like window.innerWidth/2 and window.innerHeight/2, which will make the app render at quarter size.
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            //If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling setSize with false as updateStyle (the third argument). For example, setSize(window.innerWidth/2, window.innerHeight/2, false) will render your app at half resolution, given that your <canvas> has 100% width and height.
+
+            //Last but not least, we add the renderer element to our HTML document.
+            //This is a <canvas> element the renderer uses to display the scene to us.
+            document.body.appendChild(renderer.domElement);
+
+            //BoxGeometry is an object that contains all the points (vertices) and fill (faces) of the cube.
+            const geometry = new THREE.BoxGeometry();
+
+            //we need a material to color it. We'll stick to the MeshBasicMaterial for now.
+            //All materials take an object of properties which will be applied to them.
+            const material = new THREE.MeshMatcapMaterial({ color: 0xefdbd3 });
+
+            //The third thing we need is a Mesh.
+            //A mesh is an object that takes a geometry, and applies a material to it,
+            //which we then can insert to our scene, and move freely around.
+            const cube = new THREE.Mesh(geometry, material);
+
+            //By default, when we call scene.add(), the thing we add will be added to the coordinates (0,0,0).
+            //This would cause both the camera and the cube to be inside each other.
+            scene.add(cube);
+            //To avoid this, we simply move the camera out a bit.
+            camera.position.z = 5;
+
+            //We're not actually rendering anything yet. For that, we need what's called a render or animate loop.
+            //This will create a loop that causes the renderer to draw the scene every time the screen is refreshed
+            //(on a typical screen this means 60 times per second).
+            function animate() {
+                //requestAnimationFrame has a number of advantages.
+                //Perhaps the most important one is that it pauses when the user navigates to another browser tab.
+                requestAnimationFrame(animate);
+
+                //This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. 
+                //Basically, anything you want to move or change while the app is running has to go through the animate loop. 
+                //You can of course call other functions from there, so that you don't end up with an animate function 
+                //that's hundreds of lines.
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        </script>
+    </body>
+</html>
